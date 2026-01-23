@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marksheet Extraction AI - Extract Academic Data Instantly</title>
+    <meta name="description" content="AI-powered marksheet extraction tool that converts academic documents into structured JSON data with confidence scores">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="bg-gradient"></div>
+    <div class="bg-grid"></div>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <rect width="32" height="32" rx="8" fill="url(#gradient)"/>
+                    <path d="M16 8L22 12V20L16 24L10 20V12L16 8Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs>
+                        <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32">
+                            <stop offset="0%" stop-color="#6366f1"/>
+                            <stop offset="100%" stop-color="#8b5cf6"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>Marksheet AI</span>
+            </div>
+            <nav class="nav">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#how-it-works" class="nav-link">How It Works</a>
+                <a href="http://localhost:8000" target="_blank" class="nav-link">API Docs</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="badge">
+                    <span class="badge-icon">✨</span>
+                    <span>AI-Powered Extraction</span>
+                </div>
+                <h1 class="hero-title">
+                    Extract Marksheet Data
+                    <span class="gradient-text">Instantly with AI</span>
+                </h1>
+                <p class="hero-description">
+                    Upload any academic marksheet and get structured JSON data with confidence scores. 
+                    Powered by OCR and Google Gemini AI.
+                </p>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-value">95%+</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">&lt;10s</div>
+                        <div class="stat-label">Processing Time</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">PDF + Images</div>
+                        <div class="stat-label">Supported Formats</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upload Section -->
+    <section class="upload-section">
+        <div class="container">
+            <div class="upload-card">
+                <div class="upload-header">
+                    <h2>Upload Marksheet</h2>
+                    <p>Drag and drop or click to select a file (PDF, JPG, PNG)</p>
+                </div>
+                
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" hidden>
+                    <div class="upload-placeholder" id="uploadPlaceholder">
+                        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                            <circle cx="32" cy="32" r="32" fill="#f0f4ff"/>
+                            <path d="M32 20V44M20 32H44" stroke="#6366f1" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                        <h3>Drop your marksheet here</h3>
+                        <p>or click to browse files</p>
+                        <div class="supported-formats">
+                            <span class="format-badge">PDF</span>
+                            <span class="format-badge">JPG</span>
+                            <span class="format-badge">PNG</span>
+                        </div>
+                    </div>
+                    <div class="file-preview" id="filePreview" style="display: none;">
+                        <div class="file-info">
+                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                                <rect width="48" height="48" rx="8" fill="#f0f4ff"/>
+                                <path d="M24 16V32M18 24H30" stroke="#6366f1" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <div class="file-details">
+                                <div class="file-name" id="fileName"></div>
+                                <div class="file-size" id="fileSize"></div>
+                            </div>
+                        </div>
+                        <button class="btn-remove" id="removeFile">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn-primary" id="extractBtn" disabled>
+                    <span id="btnText">Extract Data</span>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" id="btnIcon">
+                        <path d="M5 10H15M15 10L10 5M15 10L10 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <div class="spinner" id="spinner" style="display: none;"></div>
+                </button>
+
+                <!-- Progress Bar -->
+                <div class="progress-container" id="progressContainer" style="display: none;">
+                    <div class="progress-steps">
+                        <div class="progress-step" id="step1">
+                            <div class="step-icon">1</div>
+                            <div class="step-label">OCR Extraction</div>
+                        </div>
+                        <div class="progress-step" id="step2">
+                            <div class="step-icon">2</div>
+                            <div class="step-label">Text Cleaning</div>
+                        </div>
+                        <div class="progress-step" id="step3">
+                            <div class="step-icon">3</div>
+                            <div class="step-label">AI Structuring</div>
+                        </div>
+                        <div class="progress-step" id="step4">
+                            <div class="step-icon">4</div>
+                            <div class="step-label">Confidence Scoring</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section" id="resultsSection" style="display: none;">
+        <div class="container">
+            <div class="results-header">
+                <h2>Extraction Results</h2>
+                <div class="results-actions">
+                    <button class="btn-secondary" id="copyBtn">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <rect x="6" y="6" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                            <path d="M4 14V4H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        Copy JSON
+                    </button>
+                    <button class="btn-secondary" id="downloadBtn">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M10 3V13M10 13L6 9M10 13L14 9M3 17H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Download
+                    </button>
+                </div>
+            </div>
+
+            <div class="confidence-badge" id="confidenceBadge">
+                <span class="confidence-label">Overall Confidence</span>
+                <span class="confidence-value" id="confidenceValue">0%</span>
+            </div>
+
+            <div class="results-grid">
+                <div class="result-card">
+                    <h3>Candidate Details</h3>
+                    <div class="result-content" id="candidateDetails"></div>
+                </div>
+                <div class="result-card">
+                    <h3>Academic Details</h3>
+                    <div class="result-content" id="academicDetails"></div>
+                </div>
+            </div>
+
+            <div class="json-viewer">
+                <div class="json-header">
+                    <h3>Complete JSON Response</h3>
+                    <button class="btn-icon" id="toggleJson">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M5 8L10 13L15 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+                <pre class="json-content" id="jsonContent"></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Powerful Features</h2>
+                <p>Everything you need for accurate marksheet data extraction</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>OCR Extraction</h3>
+                    <p>Advanced OCR technology extracts text from any marksheet format with high accuracy</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI Structuring</h3>
+                    <p>Google Gemini AI structures and normalizes data into a clean JSON format</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Confidence Scores</h3>
+                    <p>Every field includes a confidence score (0-1) for reliability assessment</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Fast Processing</h3>
+                    <p>Get results in seconds with our optimized extraction pipeline</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Format Agnostic</h3>
+                    <p>Works with different board marksheets - CBSE, State boards, Universities</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure & Private</h3>
+                    <p>Files are processed locally and not stored on any server</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <h2>How It Works</h2>
+                <p>Simple 4-step process powered by AI</p>
+            </div>
+            <div class="steps-container">
+                <div class="step-card">
+                    <div class="step-number">01</div>
+                    <h3>Upload Marksheet</h3>
+                    <p>Upload your marksheet in PDF, JPG, or PNG format</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step-card">
+                    <div class="step-number">02</div>
+                    <h3>OCR Extraction</h3>
+                    <p>EasyOCR extracts all text from the document</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step-card">
+                    <div class="step-number">03</div>
+                    <h3>AI Processing</h3>
+                    <p>Gemini AI structures data into JSON format</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step-card">
+                    <div class="step-number">04</div>
+                    <h3>Get Results</h3>
+                    <p>Receive structured data with confidence scores</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <div class="logo">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <rect width="32" height="32" rx="8" fill="url(#gradient2)"/>
+                            <path d="M16 8L22 12V20L16 24L10 20V12L16 8Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <defs>
+                                <linearGradient id="gradient2" x1="0" y1="0" x2="32" y2="32">
+                                    <stop offset="0%" stop-color="#6366f1"/>
+                                    <stop offset="100%" stop-color="#8b5cf6"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <span>Marksheet AI</span>
+                    </div>
+                    <p>AI-powered marksheet extraction for academic institutions</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Product</h4>
+                        <a href="#features">Features</a>
+                        <a href="#how-it-works">How It Works</a>
+                        <a href="http://localhost:8000" target="_blank">API Docs</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Resources</h4>
+                        <a href="../README.md">Documentation</a>
+                        <a href="../APPROACH.md">Technical Approach</a>
+                        <a href="../QUICKSTART.md">Quick Start</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Marksheet AI. Built for AI Engineer Intern Assignment.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
