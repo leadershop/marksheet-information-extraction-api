@@ -32,3 +32,7 @@ GEMINI_MODEL = "gemini-flash-latest"
 
 # Keeping temperature low (0.1) so the output is more predictable/consistent.
 GEMINI_TEMPERATURE = 0.1
+
+# --- Security ---
+# Simple API Key for authentication
+API_KEY = os.getenv("API_KEY", "marksheet-ai-secret-key")

@@ -9,6 +9,7 @@ class FieldWithConfidence(BaseModel):
     # This helps us tell the user how sure we are about the value.
     value: Optional[str] = Field(None, description="The actual text we found")
     confidence: float = Field(..., ge=0.0, le=1.0, description="How confident we are in this specific field")
+    bounding_box: Optional[List[List[float]]] = Field(None, description="Coordinates of the text in the image [[x,y], [x,y], [x,y], [x,y]]")
 
 class SubjectMarks(BaseModel):
     # Model for a single subject row on the marksheet

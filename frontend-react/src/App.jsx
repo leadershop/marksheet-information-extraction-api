@@ -67,6 +67,9 @@ function App() {
 
       const response = await fetch(`${API_BASE_URL}/extract`, {
         method: 'POST',
+        headers: {
+          'X-API-KEY': 'marksheet-ai-secret-key'
+        },
         body: formData
       });
 

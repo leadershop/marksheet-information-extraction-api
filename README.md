@@ -24,6 +24,11 @@ So, I decided on a two-step "OCR + LLM" pipeline:
 **Wait, why not just send the image to AI?**
 I tried that! But sometimes the AI would "hallucinate" (make up) roll numbers or names if the image was a bit blurry. By doing OCR first, I make sure the AI is only working with text that we actually found on the paper.
 
+### ✨ New Advanced Features
+*   **Visual Grounding (Bounding Boxes)**: The API now returns the exact coordinates (`bounding_box`) for every extracted field. This allows frontends to highlight exactly where the name or marks were found on the original document.
+*   **Security (API Key)**: Added a layer of security using an `X-API-KEY` header check.
+*   **CSV Export**: One-click export to professional CSV reports from the dashboard.
+
 ## 🛠️ How to get it running
 
 ### Prerequisites
@@ -46,6 +51,7 @@ I tried that! But sometimes the AI would "hallucinate" (make up) roll numbers or
 4.  **Add your API Key**: Create a `.env` file in the main folder and put your key in:
     ```
     GEMINI_API_KEY=your_key_here
+    API_KEY=marksheet-ai-secret-key
     ```
 
 ### Running it

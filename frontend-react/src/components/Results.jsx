@@ -35,6 +35,28 @@ function Results({ data }) {
         URL.revokeObjectURL(url);
     };
 
+    const handleExportCSV = () => {
+        if (!data.academic_details?.subjects) return;
+
+        const headers = ["Subject", "Obtained Marks", "Max Marks", "Grade", "Confidence"];
+        const rows = data.academic_details.subjects.map(s => [
+            s.subject?.value || "",
+            s.obtained_marks?.value || "",
+            s.max_marks?.value || "",
+            s.grade?.value || "",
+            `${Math.round(s.subject?.confidence * 100)}%`
+        ]);
+
+        const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'marksheet-results.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
     return (
         <section id="results" className="results-section slide-up">
             <div className="results-header">
@@ -48,6 +70,9 @@ function Results({ data }) {
                         {Math.round(data.overall_confidence * 100)}%
                     </span>
                 </div>
+                <button className="export-csv-btn" onClick={handleExportCSV}>
+                    <span className="btn-icon">📊</span> Export CSV
+                </button>
             </div>
 
             <div className="results-grid">

@@ -1,7 +1,7 @@
 import easyocr
 import numpy as np
 from PIL import Image
-from typing import Tuple
+from typing import Tuple, List, Dict, Any
 from app.config import OCR_LANGUAGES
 
 # --- Global OCR Reader ---
@@ -23,9 +23,12 @@ def get_ocr_reader():
     return _reader
 
 
-def extract_text_from_image(image_file_path: str) -> Tuple[str, float]:
+def extract_text_from_image(image_file_path: str) -> Tuple[str, float, List[Dict[str, Any]]]:
     """
-    Takes an image, runs OCR, and returns the full text + average confidence.
+    Takes an image, runs OCR, and returns:
+    1. Full reconstructed text (str)
+    2. Average confidence (float)
+    3. Raw metadata like bounding boxes (List[Dict])
     """
     try:
         reader = get_ocr_reader()
@@ -51,7 +54,16 @@ def extract_text_from_image(image_file_path: str) -> Tuple[str, float]:
         raw_results = reader.readtext(img_array, detail=1, contrast_ths=0.1, mag_ratio=1.5)
         
         if not raw_results:
-            return "", 0.0
+            return "", 0.0, []
+            
+        # Format raw results for downstream use
+        metadata = []
+        for res in raw_results:
+            metadata.append({
+                "text": res[1],
+                "confidence": float(res[2]),
+                "bbox": [[float(p[0]), float(p[1])] for p in res[0]]
+            })
             
         # --- Robust Line Reconstruction ---
         # Sort by top coordinate first
@@ -83,14 +95,14 @@ def extract_text_from_image(image_file_path: str) -> Tuple[str, float]:
         avg_conf = sum(conf_scores) / len(conf_scores) if conf_scores else 0.0
         
         print(f"[OCR] Reconstructed {len(test_lines)} logical lines of text.")
-        return full_document_text, avg_conf
+        return full_document_text, avg_conf, metadata
         
     except Exception as e:
         print(f"[OCR ERROR] Something went wrong while reading image: {str(e)}")
         raise Exception(f"Image OCR failed: {str(e)}")
 
 
-def extract_text_from_pdf(pdf_file_path: str) -> Tuple[str, float]:
+def extract_text_from_pdf(pdf_file_path: str) -> Tuple[str, float, List[Dict[str, Any]]]:
     """
     EasyOCR doesn't read PDFs directly, so I'm converting the PDF to an image first.
     I'm only doing the first page for now because marksheets are usually just one page.
@@ -114,13 +126,13 @@ def extract_text_from_pdf(pdf_file_path: str) -> Tuple[str, float]:
             pages[0].save(tmp_img_path, 'PNG')
         
         # Run the standard image OCR
-        text, confidence = extract_text_from_image(tmp_img_path)
+        text, confidence, metadata = extract_text_from_image(tmp_img_path)
         
         # Cleanup the temp image so we don't leave junk on the computer
         if os.path.exists(tmp_img_path):
             os.remove(tmp_img_path)
             
-        return text, confidence
+        return text, confidence, metadata
         
     except Exception as e:
         print(f"[PDF ERROR] Failed to process PDF: {str(e)}")

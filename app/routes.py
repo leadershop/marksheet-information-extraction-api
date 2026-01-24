@@ -1,12 +1,26 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Depends, Security
+from fastapi.security.api_key import APIKeyHeader
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.models import ExtractionResponse, ErrorResponse
+from app.config import API_KEY
 from app.utils.file_handler import validate_file, save_upload_file_tmp, cleanup_temp_file, get_file_type
 from app.utils.text_cleaner import clean_ocr_text, extract_text_snippet
+from app.utils.bounding_box_utils import apply_bounding_boxes
 from app.services.ocr_service import extract_text_from_image, extract_text_from_pdf
 from app.services.llm_service import structure_data_with_llm
 from app.services.confidence_service import calculate_overall_confidence
+
+# --- Security Setup ---
+api_key_header = APIKeyHeader(name="X-API-KEY", auto_error=False)
+
+async def get_api_key(api_key: str = Security(api_key_header)):
+    if api_key == API_KEY:
+        return api_key
+    raise HTTPException(
+        status_code=403,
+        detail="Could not validate API Key. Please provide a valid X-API-KEY header."
+    )
 
 # Initializing FastAPI
 # I set the docs_url to '/' so the Swagger UI opens by default at localhost:8000
@@ -47,7 +61,8 @@ async def health_check():
     tags=["Core Logic"]
 )
 async def extract_marksheet(
-    file: UploadFile = File(..., description="PDF or Image of a marksheet")
+    file: UploadFile = File(..., description="PDF or Image of a marksheet"),
+    api_key: str = Depends(get_api_key)
 ):
     """
     This is the main endpoint. I've broken the logic into a few steps (OCR, cleaning, AI)
@@ -70,9 +85,9 @@ async def extract_marksheet(
         print(f"[STAGE] Running OCR for {file_ext} type...")
         
         if file_ext == "pdf":
-            raw_text, ocr_confidence = extract_text_from_pdf(temp_file_path)
+            raw_text, ocr_confidence, metadata = extract_text_from_pdf(temp_file_path)
         else:
-            raw_text, ocr_confidence = extract_text_from_image(temp_file_path)
+            raw_text, ocr_confidence, metadata = extract_text_from_image(temp_file_path)
             
         if not raw_text:
             # If no text is found, there's no point in continuing
@@ -96,10 +111,14 @@ async def extract_marksheet(
         structured_data = structure_data_with_llm(cleaned_text, temp_file_path)
         
         # 6. Confidence Scoring
-        # Trying to guess how accurate the results are for the UI
         overall_conf = calculate_overall_confidence(structured_data, ocr_confidence)
         
-        # 7. Final Response
+        # 7. Grounding (Bounding Boxes)
+        # We match the extracted text back to the OCR metadata to find coordinates.
+        print("[STAGE] Mapping extracted fields to bounding boxes...")
+        apply_bounding_boxes(structured_data, metadata)
+        
+        # 8. Final Response
         result = {
             **structured_data,
             "overall_confidence": overall_conf
