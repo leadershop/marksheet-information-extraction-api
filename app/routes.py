@@ -69,8 +69,7 @@ async def health_check():
     tags=["Core Logic"]
 )
 async def extract_marksheet(
-    file: UploadFile = File(..., description="PDF or Image of a marksheet"),
-    api_key: str = Depends(get_api_key)
+    file: UploadFile = File(..., description="PDF or Image of a marksheet")
 ):
     """
     This is the main endpoint. I've broken the logic into a few steps (OCR, cleaning, AI)
