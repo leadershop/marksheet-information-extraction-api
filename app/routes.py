@@ -2,6 +2,7 @@ from fastapi import FastAPI, UploadFile, File, HTTPException, Depends, Security
 from fastapi.security.api_key import APIKeyHeader
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.models import ExtractionResponse, ErrorResponse
 from app.config import API_KEY
 from app.utils.file_handler import validate_file, save_upload_file_tmp, cleanup_temp_file, get_file_type
@@ -23,12 +24,11 @@ async def get_api_key(api_key: str = Security(api_key_header)):
     )
 
 # Initializing FastAPI
-# I set the docs_url to '/' so the Swagger UI opens by default at localhost:8000
 app = FastAPI(
     title="Marksheet AI API",
     description="A simple API that uses OCR and LLMs to get data out of academic marksheets.",
     version="1.0.0",
-    docs_url="/"
+    docs_url="/docs"
 )
 
 # Enabling CORS so the local frontend can talk to the backend.
@@ -157,3 +157,6 @@ async def general_exception_handler(request, exc):
         status_code=500,
         content={"error": "Something went wrong on the server.", "detail": str(exc)}
     )
+
+# Serve the frontend
+app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
