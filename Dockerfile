@@ -6,6 +6,9 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # Install system dependencies
+# Set non-interactive frontend for apt-get to skip prompts
+ARG DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && apt-get install -y \
     build-essential \
     libgl1 \
