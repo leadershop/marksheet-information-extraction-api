@@ -43,7 +43,7 @@ extractBtn.addEventListener('click', async () => {
     lastExtractionData = null;
 
     try {
-        const response = await fetch('http://localhost:8000/extract', {
+        const response = await fetch('/extract', {
             method: 'POST',
             headers: {
                 // Hardcoded for demo/student project simplicity
