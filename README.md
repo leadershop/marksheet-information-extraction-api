@@ -10,8 +10,8 @@ A production-grade AI solution that transforms academic marksheets (images/PDFs)
 
 ### 🌐 Live Deployment
 *   **Live Demo (Frontend + API):** [https://huggingface.co/spaces/MAyAnkkkkSaHu/marksheet-extraction-api](https://huggingface.co/spaces/MAyAnkkkkSaHu/marksheet-extraction-api)
-*   **Interactive API Documentation:** [Swagger UI Docs](https://mayankkkksahu-marksheet-extraction-api.hf.space/docs)
-*   **API Base URL:** `https://mayankkkksahu-marksheet-extraction-api.hf.space/`
+*   **Interactive API Documentation:** [https://mayankkkksahu-marksheet-extraction-api.hf.space/docs](https://mayankkkksahu-marksheet-extraction-api.hf.space/docs)
+*   **API Base URL:** ``[https://mayankkkksahu-marksheet-extraction-api.hf.space/](https://mayankkkksahu-marksheet-extraction-api.hf.space/)
 
 ---
 
