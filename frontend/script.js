@@ -45,10 +45,7 @@ extractBtn.addEventListener('click', async () => {
     try {
         const response = await fetch('/extract', {
             method: 'POST',
-            headers: {
-                // Hardcoded for demo/student project simplicity
-                'X-API-KEY': 'marksheet-ai-secret-key'
-            },
+
             body: formData
         });
 

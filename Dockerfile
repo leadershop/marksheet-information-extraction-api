@@ -1,14 +1,12 @@
 # Use an official Python runtime as a parent image
-FROM python:3.10-slim
+FROM python:3.9-slim
 
 # Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    DEBIAN_FRONTEND=noninteractive
 
 # Install system dependencies
-# Set non-interactive frontend for apt-get to skip prompts
-ARG DEBIAN_FRONTEND=noninteractive
-
 RUN apt-get update && apt-get install -y \
     build-essential \
     libgl1 \
@@ -20,21 +18,27 @@ RUN apt-get update && apt-get install -y \
     libmagic1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory in the container
-WORKDIR /app
+# Create a non-root user (recommended for HF Spaces)
+RUN useradd -m -u 1000 user
+USER user
+ENV HOME=/home/user \
+    PATH=/home/user/.local/bin:$PATH
 
-# Copy the requirements file into the container
-COPY requirements.txt .
+# Set the working directory
+WORKDIR $HOME/app
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy the requirements file
+COPY --chown=user requirements.txt .
 
-# Copy the rest of the application code into the container
-COPY . .
+# Install dependencies
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Expose the port that the app runs on (Hugging Face Spaces uses 7860)
+# Copy the rest of the application code
+COPY --chown=user . .
+
+# Expose the port that the app runs on
 EXPOSE 7860
 
 # Command to run the application
-# We use 0.0.0.0 to allow external connections
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["uvicorn", "app.routes:app", "--host", "0.0.0.0", "--port", "7860"]
