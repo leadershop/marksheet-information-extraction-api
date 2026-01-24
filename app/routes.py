@@ -1,5 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException, Depends, Security
-from fastapi.security.api_key import APIKeyHeader
+from fastapi.security.api_key import APIKeyHeader, APIKeyQuery
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -13,14 +13,22 @@ from app.services.llm_service import structure_data_with_llm
 from app.services.confidence_service import calculate_overall_confidence
 
 # --- Security Setup ---
+# --- Security Setup ---
 api_key_header = APIKeyHeader(name="X-API-KEY", auto_error=False)
+api_key_query = APIKeyQuery(name="api_key", auto_error=False)
 
-async def get_api_key(api_key: str = Security(api_key_header)):
-    if api_key == API_KEY:
-        return api_key
+async def get_api_key(
+    header_key: str = Security(api_key_header),
+    query_key: str = Security(api_key_query)
+):
+    if header_key == API_KEY:
+        return header_key
+    if query_key == API_KEY:
+        return query_key
+        
     raise HTTPException(
         status_code=403,
-        detail="Could not validate API Key. Please provide a valid X-API-KEY header."
+        detail="Could not validate API Key. Please provide a valid 'X-API-KEY' header or 'api_key' query parameter."
     )
 
 # Initializing FastAPI
